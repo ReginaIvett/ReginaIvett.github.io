@@ -13,16 +13,39 @@ const plantImage = document.getElementById('plantImage');
 const plantInfo = document.getElementById('plantInfo');
 
 let currentBlob = null, model = null, stream = null;
+let currentCamera = 'environment'; // 'environment' = trasera, 'user' = frontal
 
-// --- Home screen ---
-startBtn.addEventListener('click',()=>{
-  homeScreen.classList.add('hidden');
-  setTimeout(()=>{ homeScreen.style.display='none'; appContainer.style.display='block'; },700);
+// --- Botón Flip Camera ---
+const flipCameraBtn = document.createElement('button');
+flipCameraBtn.textContent = 'Flip Camera';
+flipCameraBtn.classList.add('primary');
+document.querySelector('.container').prepend(flipCameraBtn);
+
+// --- Start button ---
+document.addEventListener('DOMContentLoaded', ()=>{
+  startBtn.addEventListener('click', ()=>{
+    homeScreen.style.display='none';
+    appContainer.style.display='block';
+  });
 });
 
 // --- Load MobileNet ---
-async function loadModel(){ model = await mobilenet.load(); }
+async function loadModel(){
+  model = await mobilenet.load();
+  console.log('MobileNet loaded');
+}
 loadModel();
+
+// --- Convert video frame to image ---
+function videoToImage(video){
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+  const img = new Image();
+  img.src = canvas.toDataURL('image/jpeg');
+  return img;
+}
 
 // --- File input ---
 fileInput.addEventListener('change',(e)=>{
@@ -30,35 +53,11 @@ fileInput.addEventListener('change',(e)=>{
   if(file){
     previewImage.src=URL.createObjectURL(file);
     previewImage.style.display='block';
-    currentBlob=file;
     recognizeBlob(file);
   }
 });
 
-// --- Camera real-time recognition ---
-openCameraBtn.addEventListener('click', async ()=>{
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:true});
-    cameraView.srcObject=stream;
-    cameraView.style.display='block';
-    requestAnimationFrame(recognizeFrame);
-  }catch(err){ alert('Camera access denied or not supported.'); }
-});
-
-async function recognizeFrame(){
-  if(!model || !cameraView.srcObject) return;
-  if(cameraView.videoWidth && cameraView.videoHeight){
-    const canvas=document.createElement('canvas');
-    canvas.width=cameraView.videoWidth;
-    canvas.height=cameraView.videoHeight;
-    canvas.getContext('2d').drawImage(cameraView,0,0);
-    const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg'));
-    recognizeBlob(blob);
-  }
-  setTimeout(()=>requestAnimationFrame(recognizeFrame),500);
-}
-
-// --- Recognize a blob ---
+// --- Recognize blob ---
 async function recognizeBlob(blob){
   if(!model) return;
   const img = await blobToImage(blob);
@@ -68,30 +67,77 @@ async function recognizeBlob(blob){
   displayResult(name, top.probability);
 }
 
+// --- Convert blob to image ---
+function blobToImage(blob){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    img.onload=()=>{ URL.revokeObjectURL(url); resolve(img); };
+    img.onerror=reject;
+    img.src=url;
+  });
+}
+
+// --- Camera real-time recognition ---
+openCameraBtn.addEventListener('click', async ()=>{
+  startCamera(currentCamera);
+});
+
+// --- Flip Camera ---
+flipCameraBtn.addEventListener('click', async ()=>{
+  currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+  if(stream){
+    stream.getTracks().forEach(track => track.stop());
+  }
+  startCamera(currentCamera);
+});
+
+async function startCamera(facing){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facing }
+    });
+    cameraView.srcObject = stream;
+    cameraView.style.display='block';
+    cameraView.addEventListener('loadeddata',()=>requestAnimationFrame(recognizeFrame));
+  }catch(err){ alert('Camera access denied or not supported.'); }
+}
+
+// --- Recognize frame ---
+async function recognizeFrame(){
+  if(!model || !cameraView.srcObject) return;
+
+  if(cameraView.videoWidth && cameraView.videoHeight){
+    const img = videoToImage(cameraView);
+    const predictions = await model.classify(img);
+    const top = predictions[0];
+    let name = top.className.split(',')[0].trim();
+    displayResult(name, top.probability);
+  }
+
+  requestAnimationFrame(recognizeFrame);
+}
+
+// --- Display result ---
 function displayResult(name, prob){
   if(plantsDB[name]){
-    resultText.textContent=`${name} (${(prob*100).toFixed(1)}%)`;
-    plantImage.src=plantsDB[name].img;
+    resultText.textContent = `${name} (${(prob*100).toFixed(1)}%)`;
+    plantImage.src = plantsDB[name].img;
     plantImage.style.display='block';
-    plantInfo.textContent=plantsDB[name].info;
+    plantInfo.textContent = plantsDB[name].info;
     generateQR(name);
   } else {
-    resultText.textContent=`Unknown plant (${(prob*100).toFixed(1)}%)`;
+    resultText.textContent = `Unknown plant (${(prob*100).toFixed(1)}%)`;
     plantImage.style.display='none';
     plantInfo.textContent='';
   }
 }
 
+// --- Generate QR ---
 function generateQR(text){
-  new QRious({ element:qrCanvas, value:`https://wikiroots.app/plants/${encodeURIComponent(text)}`, size:200 });
-}
-
-function blobToImage(blob){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    const url=URL.createObjectURL(blob);
-    img.onload=()=>{ URL.revokeObjectURL(url); resolve(img); };
-    img.onerror=reject;
-    img.src=url;
+  new QRious({
+    element: qrCanvas,
+    value: `https://wikiroots.app/plants/${encodeURIComponent(text)}`,
+    size: 200
   });
 }
