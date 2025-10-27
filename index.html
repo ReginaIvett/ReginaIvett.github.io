@@ -1,73 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WikiRoots 🌿</title>
-
-<link rel="stylesheet" href="styles.css">
-
-<!-- Librerías externas -->
-<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.12.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.2.1/dist/mobilenet.min.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WikiRoots 🌿</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="plants.js"></script>
+  <script defer src="app.js"></script>
 </head>
+
 <body>
-
-<!-- PANTALLA INICIAL -->
-<section id="homeScreen">
-  <h1>WikiRoots 🌿</h1>
-  <p>Take a photo of any plant and instantly learn its name, care tips, watering schedule, and more.</p>
-  <div class="team">By Team #4</div>
-  <button id="startBtn">Start</button>
-</section>
-
-<!-- APP -->
-<div id="appContainer" style="display:none;">
-  <header>
-    <h2>WikiRoots</h2>
-    <div class="tagline">“Discover, care, and grow.”</div>
+  <header class="hero">
+    <h1 class="title">🌿 WikiRoots</h1>
+    <p class="subtitle">Discover. Learn. Care. — By Team #4</p>
+    <p class="slogan">“Connecting people with nature, one plant at a time.”</p>
+    <button id="startBtn" class="btn start">Start Exploring</button>
   </header>
 
-  <main class="container">
-    <div class="card">
-      <h3>Identify your plant</h3>
-      <input type="file" id="fileInput" accept="image/*">
-      <button id="openCameraBtn">Open Camera</button>
-      <p class="muted">Upload or point the camera to a plant for instant recognition.</p>
-      <img id="previewImage" alt="Preview" style="display:none;">
-      <video id="cameraView" autoplay playsinline style="display:none;"></video>
-    </div>
+  <main id="appContainer" class="hidden">
+    <!-- Section 1: Camera + Controls -->
+    <section class="camera-section">
+      <h2>Identify Your Plant</h2>
+      <video id="camera" autoplay playsinline></video>
+      <canvas id="snapshot" class="hidden"></canvas>
 
-    <div class="card">
-      <strong>Result:</strong>
-      <p id="resultText" class="muted">No plant identified yet.</p>
-      <img id="plantImage" style="width:150px;display:none;border-radius:10px;margin-top:10px;">
-      <p id="plantInfo" class="muted tiny"></p>
-      <canvas id="qrCanvas" style="margin-top:10px;"></canvas>
-    </div>
+      <div class="controls">
+        <button id="captureBtn" class="btn">📸 Capture</button>
+        <button id="flipBtn" class="btn">🔄 Flip Camera</button>
+        <button id="recognizeBtn" class="btn green">🌱 Recognize</button>
+        <input type="file" id="upload" accept="image/*" />
+      </div>
+    </section>
+
+    <!-- Section 2: Plant Info -->
+    <section id="resultSection" class="result-section hidden">
+      <h2>🌿 Plant Information</h2>
+      <div id="plantResult" class="plant-card">
+        <img id="plantImage" src="" alt="Plant Image" />
+        <h3 id="plantName"></h3>
+        <p id="plantInfo"></p>
+        <p id="plantCare"></p>
+        <div id="qrCode"></div>
+      </div>
+    </section>
+
+    <!-- Section 3: Saved Plants -->
+    <section class="saved-section">
+      <h2>🌸 My Plants</h2>
+      <div id="savedPlants" class="plant-gallery"></div>
+    </section>
   </main>
 
-  <footer>WikiRoots Prototype — by Team #4 🌱</footer>
-</div>
-
-<!-- Scripts -->
-<script src="plants.js"></script>
-<script src="app.js"></script>
-<script>
-  // --- Pantalla inicial ---
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const homeScreen = document.getElementById('homeScreen');
-    const appContainer = document.getElementById('appContainer');
-    const startBtn = document.getElementById('startBtn');
-
-    startBtn.addEventListener('click', ()=>{
-      homeScreen.style.display='none';
-      appContainer.style.display='block';
-    });
-  });
-</script>
-
+  <footer>
+    <p>WikiRoots ©️ 2025 — Made with 💚 by Team #4</p>
+  </footer>
 </body>
 </html>
