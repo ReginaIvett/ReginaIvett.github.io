@@ -3,151 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WikiRoots — Discover, Care, and Grow 🌿</title>
+<title>WikiRoots 🌿</title>
+
+<link rel="stylesheet" href="styles.css">
 
 <!-- Librerías externas -->
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.12.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.2.1/dist/mobilenet.min.js"></script>
 
-<style>
-:root{--bg:#f6fbf3;--accent:#2f8f4b;--card:#fff;--text:#222;--muted:#666;}
-*{box-sizing:border-box;}
-body{margin:0;font-family:'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);}
-#homeScreen{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center;background:linear-gradient(180deg,#e4f6e4,#f6fbf3);transition:opacity 0.8s;}
-#homeScreen.hidden{opacity:0;pointer-events:none;}
-#homeScreen h1{font-size:2.4em;color:var(--accent);margin-bottom:0.2em;}
-#homeScreen p{font-size:1.1em;color:#333;max-width:420px;line-height:1.5;}
-#homeScreen .team{margin-top:0.5em;font-weight:bold;color:#2f8f4b;}
-#startBtn{margin-top:1.4em;padding:12px 28px;border:none;background:var(--accent);color:white;border-radius:30px;font-size:1em;cursor:pointer;transition:0.3s;}
-#startBtn:hover{background:#25763d;}
-#appContainer{display:none;}
-header{padding:16px;text-align:center;border-bottom:1px solid #d8ead6;background:white;}
-header h2{margin:0;color:var(--accent);}
-header .tagline{font-style:italic;color:#397e4a;font-size:14px;}
-.container{max-width:900px;margin:auto;padding:16px;}
-.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:18px;}
-button,input[type=file],select{background:#fff;border:1px solid #ccc;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;}
-button.primary{background:var(--accent);color:white;border:none;}
-.muted{color:var(--muted);font-size:14px;}
-#previewImage,#cameraView{width:100%;border-radius:10px;display:none;}
-.tiny{font-size:13px;color:#555;}
-footer{text-align:center;padding:10px;color:#666;font-size:13px;}
-</style>
 </head>
 <body>
 
-<!-- HOME -->
+<!-- PANTALLA INICIAL -->
 <section id="homeScreen">
-<h1>WikiRoots 🌿</h1>
-<p>Take a photo of any plant and instantly learn its name, care tips, watering schedule, and more.</p>
-<div class="team">By Team #4</div>
-<button id="startBtn">Start</button>
-
-  <!-- contenido de la página -->
-  
-  <script src="plants.js"></script>
-  <script src="app.js"></script>
-</body>
+  <h1>WikiRoots 🌿</h1>
+  <p>Take a photo of any plant and instantly learn its name, care tips, watering schedule, and more.</p>
+  <div class="team">By Team #4</div>
+  <button id="startBtn">Start</button>
 </section>
 
 <!-- APP -->
-<div id="appContainer">
-<header>
-<h2>WikiRoots</h2>
-<div class="tagline">“Discover, care, and grow.”</div>
-</header>
+<div id="appContainer" style="display:none;">
+  <header>
+    <h2>WikiRoots</h2>
+    <div class="tagline">“Discover, care, and grow.”</div>
+  </header>
 
-<main class="container">
-<div class="card">
-<h3>Identify your plant</h3>
-<input type="file" id="fileInput" accept="image/*">
-<button id="openCameraBtn">Open Camera</button>
-<p class="muted">Upload or point the camera to a plant for instant recognition.</p>
-<img id="previewImage" alt="Preview">
-<video id="cameraView" autoplay playsinline></video>
+  <main class="container">
+    <div class="card">
+      <h3>Identify your plant</h3>
+      <input type="file" id="fileInput" accept="image/*">
+      <button id="openCameraBtn">Open Camera</button>
+      <p class="muted">Upload or point the camera to a plant for instant recognition.</p>
+      <img id="previewImage" alt="Preview" style="display:none;">
+      <video id="cameraView" autoplay playsinline style="display:none;"></video>
+    </div>
 
-<div class="card">
-<strong>Result:</strong>
-<p id="resultText" class="muted">No plant identified yet.</p>
-<img id="plantImage" style="width:150px;display:none;border-radius:10px;margin-top:10px;">
-<p id="plantInfo" class="muted tiny"></p>
+    <div class="card">
+      <strong>Result:</strong>
+      <p id="resultText" class="muted">No plant identified yet.</p>
+      <img id="plantImage" style="width:150px;display:none;border-radius:10px;margin-top:10px;">
+      <p id="plantInfo" class="muted tiny"></p>
+      <canvas id="qrCanvas" style="margin-top:10px;"></canvas>
+    </div>
+  </main>
+
+  <footer>WikiRoots Prototype — by Regina Ivett 🌱</footer>
 </div>
 
-<canvas id="qrCanvas"></canvas>
-</div>
-</main>
-
-<footer>WikiRoots Prototype — by Regina Ivett 🌱</footer>
-</div>
-
+<!-- Scripts -->
+<script src="plants.js"></script>
+<script src="app.js"></script>
 <script>
-// --- Pantalla inicial ---
-const homeScreen=document.getElementById('homeScreen');
-const appContainer=document.getElementById('appContainer');
-const startBtn=document.getElementById('startBtn');
-startBtn.addEventListener('click',()=>{
-  homeScreen.classList.add('hidden');
-  setTimeout(()=>{homeScreen.style.display='none';appContainer.style.display='block';},700);
-});
+  // --- Pantalla inicial ---
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const homeScreen = document.getElementById('homeScreen');
+    const appContainer = document.getElementById('appContainer');
+    const startBtn = document.getElementById('startBtn');
 
-// --- Variables ---
-const fileInput=document.getElementById('fileInput');
-const previewImage=document.getElementById('previewImage');
-const cameraView=document.getElementById('cameraView');
-const openCameraBtn=document.getElementById('openCameraBtn');
-const resultText=document.getElementById('resultText');
-const qrCanvas=document.getElementById('qrCanvas');
-const plantImage=document.getElementById('plantImage');
-const plantInfo=document.getElementById('plantInfo');
+    startBtn.addEventListener('click', ()=>{
+      homeScreen.style.display='none';
+      appContainer.style.display='block';
+    });
+  });
+</script>
 
-let currentBlob=null, model=null, stream=null;
-
-// --- Plant database ---
-const plantsDB={
-"Monstera": { img:"https://i.imgur.com/F2QGz3Y.jpg", info:"Water weekly. Indirect light. Repot every 2 years."},
-"Aloe Vera": { img:"https://i.imgur.com/IBV3rjH.jpg", info:"Water every 2-3 weeks. Full sun. Avoid overwatering."},
-"Lavender": { img:"https://i.imgur.com/KM2OjRM.jpg", info:"Water weekly. Full sun. Prune after flowering."},
-"Fiddle Leaf Fig": { img:"https://i.imgur.com/urU1DBU.jpg", info:"Water weekly. Bright indirect light. Rotate monthly."},
-"Sunflower": { img:"https://i.imgur.com/j1jvM3U.jpg", info:"Water regularly. Full sun. Support tall stems."},
-"Cactus": { img:"https://i.imgur.com/6oXdfPZ.jpg", info:"Water sparingly. Full sun. Well-drained soil."},
-"Rose": { img:"https://i.imgur.com/Yr9K4uJ.jpg", info:"Water daily in summer. Full sun. Prune regularly."},
-"Orchid": { img:"https://i.imgur.com/h8L2HUp.jpg", info:"Water weekly. Indirect light. Keep humidity high."},
-"Bamboo": { img:"https://i.imgur.com/4cJ6k4R.jpg", info:"Water daily. Bright indirect light. Fertilize monthly."},
-"Tulip": { img:"https://i.imgur.com/9iHg6Vd.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
-"Mint": { img:"https://i.imgur.com/2kgF4fY.jpg", info:"Water frequently. Partial sun. Harvest regularly."},
-"Basil": { img:"https://i.imgur.com/3cT1KkK.jpg", info:"Water often. Full sun. Pinch leaves to grow bushy."},
-"Spider Plant": { img:"https://i.imgur.com/dh8Ccm6.jpg", info:"Water weekly. Indirect light. Propagate by offsets."},
-"Peace Lily": { img:"https://i.imgur.com/9Wm6S3Q.jpg", info:"Water weekly. Low light. Remove dead flowers."},
-"Pothos": { img:"https://i.imgur.com/4HsPSsU.jpg", info:"Water weekly. Low to medium light. Easy to grow."},
-"Geranium": { img:"https://i.imgur.com/n0hZ2K2.jpg", info:"Water moderately. Full sun. Deadhead flowers."},
-"Marigold": { img:"https://i.imgur.com/Exw6JtD.jpg", info:"Water moderately. Full sun. Protect from frost."},
-"Daffodil": { img:"https://i.imgur.com/LJxCrEo.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
-"Snake Plant": { img:"https://i.imgur.com/NZyyRgO.jpg", info:"Water sparingly. Low light. Very hardy."},
-"Hibiscus": { img:"https://i.imgur.com/7jL8eTP.jpg", info:"Water regularly. Full sun. Fertilize monthly."}
-};
-
-// --- Load MobileNet ---
-async function loadModel(){ model = await mobilenet.load(); }
-loadModel();
-
-// --- File input ---
-fileInput.addEventListener('change',(e)=>{
-  const file=e.target.files[0];
-  if(file){
-    previewImage.src=URL.createObjectURL(file);
-    previewImage.style.display='block';
-    currentBlob=file;
-    recognizeBlob(file);
-  }
-});
-
-// --- Camera & real-time recognition ---
-openCameraBtn.addEventListener('click', async ()=>{
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:true});
-    cameraView.srcObject=stream;
-    cameraView.style.display='block';
-    requestAnimationFrame(recognizeFrame);
-  }catch(err){ alert('Camera access denied or not supported.'); }
-});
+</body>
+</html>
