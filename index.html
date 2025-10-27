@@ -1,95 +1,165 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WikiRoots — Plant ID & Care</title>
-
-  <!-- QR code generator -->
-  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WikiRoots</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #eafaf1, #c8eedc);
+            color: #2b4b3f;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 1.5em;
+            text-align: center;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+        }
+        nav {
+            background-color: #a5d6a7;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px 0;
+        }
+        nav a {
+            text-decoration: none;
+            color: #1b5e20;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            color: #004d40;
+        }
+        section {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        h2 {
+            color: #1b5e20;
+            border-bottom: 2px solid #81c784;
+            padding-bottom: 5px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .plants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .plant-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .plant-card:hover {
+            transform: scale(1.03);
+        }
+        .plant-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        footer {
+            text-align: center;
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            margin-top: 30px;
+        }
+        button {
+            background-color: #66bb6a;
+            border: none;
+            padding: 10px 15px;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #43a047;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M12 2C10.5 6 8 8 6 10s-2 5 2 8 7 4 10 2c0 0 0-6-6-10C12 8 12 2 12 2z" fill="#2f8f4b"/>
-    </svg>
-    <h1>WikiRoots — Plant ID & Care</h1>
-  </header>
+    <header>
+        🌿 WikiRoots – Discover, Care, and Grow
+    </header>
 
-  <main class="container">
-    <div class="grid">
-      <section class="card main">
-        <div class="center">
-          <div class="header-row">
-            <strong>Identify a plant</strong>
-            <div class="muted tiny" id="performanceInfo">Perf: —</div>
-          </div>
+    <nav>
+        <a href="#identify">Identify</a>
+        <a href="#care">Care Tips</a>
+        <a href="#myplants">My Plants</a>
+        <a href="#qr">QR Codes</a>
+        <a href="#about">About</a>
+    </nav>
 
-          <div class="controls card control-row">
-            <input id="fileInput" type="file" accept="image/*" />
-            <button id="cameraBtn">Use Camera</button>
-            <select id="modelSelect" title="Backend model selection">
-              <option value="auto">Backend: auto</option>
-            </select>
-            <button id="identifyBtn" class="primary">Identify</button>
-            <button id="clearBtn">Clear</button>
-          </div>
+    <section id="identify">
+        <h2>Identify Your Plant</h2>
+        <div class="card">
+            <p>Take or upload a photo of your plant and let our AI recognize it instantly.</p>
+            <button>📷 Open Camera (AI Scan)</button>
+        </div>
+    </section>
 
-          <div class="preview-area card">
-            <img id="previewImage" class="preview" alt="preview" src="" style="display:none" />
-            <div id="noImage" class="muted">No image selected</div>
-          </div>
-
-          <div class="card" id="recognitionCard">
-            <div class="recognition">
-              <div>
-                <strong>Recognition</strong>
-                <div id="recognitionBox" class="muted">No result</div>
-                <div id="confidenceBox" class="tiny muted"></div>
-              </div>
-              <div class="actions">
-                <button id="savePlantBtn" disabled>Save</button>
-                <button id="generateQrBtn">Generate QR</button>
-              </div>
+    <section id="care">
+        <h2>Care & Maintenance</h2>
+        <div class="plants">
+            <div class="plant-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Ficus_elastica_leaf_closeup.jpg" alt="Rubber Plant">
+                <h3>Rubber Plant</h3>
+                <p>Water every 1–2 weeks. Avoid direct sunlight.</p>
             </div>
-
-            <canvas id="qrCanvas" style="width:100%;height:160px;margin-top:10px"></canvas>
-          </div>
-
-          <div class="card" id="plantProfileCard">
-            <strong>Plant profile</strong>
-            <div id="plantProfile" class="muted">No profile shown</div>
-          </div>
-
+            <div class="plant-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Succulent_plant.jpg" alt="Succulent">
+                <h3>Succulent</h3>
+                <p>Needs bright light and watering every 2 weeks.</p>
+            </div>
+            <div class="plant-card">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Monstera_deliciosa_leaf.jpg" alt="Monstera">
+                <h3>Monstera</h3>
+                <p>Keep soil slightly moist, moderate sunlight.</p>
+            </div>
         </div>
-      </section>
+    </section>
 
-      <aside class="card side">
-        <strong>My Plants</strong>
-        <div id="myPlantsList" class="muted tiny" style="margin-top:8px">No saved plants</div>
-
-        <div style="margin-top:12px">
-          <strong>Settings</strong>
-          <div class="muted tiny" style="margin-top:8px">
-            Device memory: <span id="memHint">—</span><br/>
-            Auto reminders: <label><input id="autoRemToggle" type="checkbox" checked /> On</label>
-          </div>
+    <section id="myplants">
+        <h2>My Plants</h2>
+        <div class="card">
+            <p>Save your favorite plants and get reminders for watering and soil changes.</p>
+            <button>💾 Add to My Plants</button>
         </div>
+    </section>
 
-        <div style="margin-top:12px">
-          <strong>Notes</strong>
-          <div class="muted tiny">This client calls <code>/api/identify</code>. See backend examples in README.</div>
+    <section id="qr">
+        <h2>QR Plant Profiles</h2>
+        <div class="card">
+            <p>Each plant has its own QR code sticker. Scan to view care details and history.</p>
+            <button>📱 Scan QR</button>
         </div>
-      </aside>
-    </div>
+    </section>
+
+    <section id="about">
+        <h2>About WikiRoots</h2>
+        <p>WikiRoots combines artificial intelligence and environmental awareness to help users identify, care for, and preserve plants easily. By encouraging responsible care, the app supports sustainability and love for nature.</p>
+    </section>
 
     <footer>
-      Prototype for STEM project — WikiRoots
+        🌱 WikiRoots ©️ 2025 – Developed by Regina Ivett
     </footer>
-  </main>
-
-  <script src="app.js" type="module"></script>
 </body>
 </html>
