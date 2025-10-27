@@ -1,172 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WikiRoots</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to bottom, #eafaf1, #c8eedc);
-            color: #2b4b3f;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #2e7d32;
-            color: white;
-            padding: 1.5em;
-            text-align: center;
-            font-size: 1.8em;
-            letter-spacing: 1px;
-        }
-        .tagline {
-            font-size: 1.1em;
-            font-style: italic;
-            color: #c8e6c9;
-            margin-top: 8px;
-        }
-        nav {
-            background-color: #a5d6a7;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 10px 0;
-        }
-        nav a {
-            text-decoration: none;
-            color: #1b5e20;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        nav a:hover {
-            color: #004d40;
-        }
-        section {
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-        }
-        h2 {
-            color: #1b5e20;
-            border-bottom: 2px solid #81c784;
-            padding-bottom: 5px;
-        }
-        .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .plants {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .plant-card {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-            padding: 15px;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        .plant-card:hover {
-            transform: scale(1.03);
-        }
-        .plant-card img {
-            width: 100%;
-            border-radius: 10px;
-        }
-        footer {
-            text-align: center;
-            background-color: #2e7d32;
-            color: white;
-            padding: 15px;
-            margin-top: 30px;
-        }
-        button {
-            background-color: #66bb6a;
-            border: none;
-            padding: 10px 15px;
-            color: white;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover {
-            background-color: #43a047;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WikiRoots — Discover, Care, and Grow 🌿</title>
+
+<!-- Librerías externas -->
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.12.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.2.1/dist/mobilenet.min.js"></script>
+
+<style>
+:root{--bg:#f6fbf3;--accent:#2f8f4b;--card:#fff;--text:#222;--muted:#666;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);}
+#homeScreen{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center;background:linear-gradient(180deg,#e4f6e4,#f6fbf3);transition:opacity 0.8s;}
+#homeScreen.hidden{opacity:0;pointer-events:none;}
+#homeScreen h1{font-size:2.4em;color:var(--accent);margin-bottom:0.2em;}
+#homeScreen p{font-size:1.1em;color:#333;max-width:420px;line-height:1.5;}
+#homeScreen .team{margin-top:0.5em;font-weight:bold;color:#2f8f4b;}
+#startBtn{margin-top:1.4em;padding:12px 28px;border:none;background:var(--accent);color:white;border-radius:30px;font-size:1em;cursor:pointer;transition:0.3s;}
+#startBtn:hover{background:#25763d;}
+#appContainer{display:none;}
+header{padding:16px;text-align:center;border-bottom:1px solid #d8ead6;background:white;}
+header h2{margin:0;color:var(--accent);}
+header .tagline{font-style:italic;color:#397e4a;font-size:14px;}
+.container{max-width:900px;margin:auto;padding:16px;}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:18px;}
+button,input[type=file],select{background:#fff;border:1px solid #ccc;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;}
+button.primary{background:var(--accent);color:white;border:none;}
+.muted{color:var(--muted);font-size:14px;}
+#previewImage,#cameraView{width:100%;border-radius:10px;display:none;}
+.tiny{font-size:13px;color:#555;}
+footer{text-align:center;padding:10px;color:#666;font-size:13px;}
+</style>
 </head>
 <body>
-    <header>
-        🌿 WikiRoots
-        <div class="tagline">“Discover, care, and grow.”</div>
-    </header>
 
-    <nav>
-        <a href="#identify">Identify</a>
-        <a href="#care">Care Tips</a>
-        <a href="#myplants">My Plants</a>
-        <a href="#qr">QR Codes</a>
-        <a href="#about">About</a>
-    </nav>
+<!-- HOME -->
+<section id="homeScreen">
+<h1>WikiRoots 🌿</h1>
+<p>Take a photo of any plant and instantly learn its name, care tips, watering schedule, and more.</p>
+<div class="team">By Team #4</div>
+<button id="startBtn">Start</button>
+</section>
 
-    <section id="identify">
-        <h2>Identify Your Plant</h2>
-        <div class="card">
-            <p>Take or upload a photo of your plant and let our AI recognize it instantly.</p>
-            <button>📷 Open Camera (AI Scan)</button>
-        </div>
-    </section>
+<!-- APP -->
+<div id="appContainer">
+<header>
+<h2>WikiRoots</h2>
+<div class="tagline">“Discover, care, and grow.”</div>
+</header>
 
-    <section id="care">
-        <h2>Care & Maintenance</h2>
-        <div class="plants">
-            <div class="plant-card">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Ficus_elastica_leaf_closeup.jpg" alt="Rubber Plant">
-                <h3>Rubber Plant</h3>
-                <p>Water every 1–2 weeks. Avoid direct sunlight.</p>
-            </div>
-            <div class="plant-card">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Succulent_plant.jpg" alt="Succulent">
-                <h3>Succulent</h3>
-                <p>Needs bright light and watering every 2 weeks.</p>
-            </div>
-            <div class="plant-card">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Monstera_deliciosa_leaf.jpg" alt="Monstera">
-                <h3>Monstera</h3>
-                <p>Keep soil slightly moist, moderate sunlight.</p>
-            </div>
-        </div>
-    </section>
+<main class="container">
+<div class="card">
+<h3>Identify your plant</h3>
+<input type="file" id="fileInput" accept="image/*">
+<button id="openCameraBtn">Open Camera</button>
+<button id="captureBtn" disabled>Capture</button>
+<button id="identifyBtn" class="primary" disabled>Recognize</button>
+<p class="muted">Upload or capture a plant photo for instant recognition.</p>
+<img id="previewImage" alt="Preview">
+<video id="cameraView" autoplay playsinline></video>
 
-    <section id="myplants">
-        <h2>My Plants</h2>
-        <div class="card">
-            <p>Save your favorite plants and get reminders for watering and soil changes.</p>
-            <button>💾 Add to My Plants</button>
-        </div>
-    </section>
+<div class="card">
+<strong>Result:</strong>
+<p id="resultText" class="muted">No plant identified yet.</p>
+<img id="plantImage" style="width:150px;display:none;border-radius:10px;margin-top:10px;">
+<p id="plantInfo" class="muted tiny"></p>
+</div>
 
-    <section id="qr">
-        <h2>QR Plant Profiles</h2>
-        <div class="card">
-            <p>Each plant has its own QR code sticker. Scan to view care details and history.</p>
-            <button>📱 Scan QR</button>
-        </div>
-    </section>
+<canvas id="qrCanvas"></canvas>
+</div>
+</main>
 
-    <section id="about">
-        <h2>About WikiRoots</h2>
-        <p>WikiRoots combines artificial intelligence and environmental awareness to help users identify, care for, and preserve plants easily. By encouraging responsible care, the app supports sustainability and love for nature.</p>
-    </section>
+<footer>WikiRoots Prototype — by Regina Ivett 🌱</footer>
+</div>
 
-    <footer>
-        🌱 WikiRoots ©️ 2025 – Developed by Regina Ivett
-    </footer>
+<script>
+// --- Pantalla inicial ---
+const homeScreen = document.getElementById('homeScreen');
+const appContainer = document.getElementById('appContainer');
+const startBtn = document.getElementById('startBtn');
+startBtn.addEventListener('click', () => {
+  homeScreen.classList.add('hidden');
+  setTimeout(()=>{ homeScreen.style.display='none'; appContainer.style.display='block'; },700);
+});
+
+// --- Variables ---
+const fileInput = document.getElementById('fileInput');
+const previewImage = document.getElementById('previewImage');
+const cameraView = document.getElementById('cameraView');
+const openCameraBtn = document.getElementById('openCameraBtn');
+const captureBtn = document.getElementById('captureBtn');
+const identifyBtn = document.getElementById('identifyBtn');
+const resultText = document.getElementById('resultText');
+const qrCanvas = document.getElementById('qrCanvas');
+const plantImage = document.getElementById('plantImage');
+const plantInfo = document.getElementById('plantInfo');
+
+let currentBlob = null, model = null, stream = null;
+
+// --- Plant database ---
+const plantsDB = {
+  "Monstera": { img:"https://i.imgur.com/F2QGz3Y.jpg", info:"Water weekly. Indirect light. Repot every 2 years."},
+  "Aloe Vera": { img:"https://i.imgur.com/IBV3rjH.jpg", info:"Water every 2-3 weeks. Full sun. Avoid overwatering."},
+  "Lavender": { img:"https://i.imgur.com/KM2OjRM.jpg", info:"Water weekly. Full sun. Prune after flowering."},
+  "Fiddle Leaf Fig": { img:"https://i.imgur.com/urU1DBU.jpg", info:"Water weekly. Bright indirect light. Rotate monthly."},
+  "Sunflower": { img:"https://i.imgur.com/j1jvM3U.jpg", info:"Water regularly. Full sun. Support tall stems."},
+  "Cactus": { img:"https://i.imgur.com/6oXdfPZ.jpg", info:"Water sparingly. Full sun. Well-drained soil."},
+  "Rose": { img:"https://i.imgur.com/Yr9K4uJ.jpg", info:"Water daily in summer. Full sun. Prune regularly."},
+  "Orchid": { img:"https://i.imgur.com/h8L2HUp.jpg", info:"Water weekly. Indirect light. Keep humidity high."},
+  "Bamboo": { img:"https://i.imgur.com/4cJ6k4R.jpg", info:"Water daily. Bright indirect light. Fertilize monthly."},
+  "Tulip": { img:"https://i.imgur.com/9iHg6Vd.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
+  "Mint": { img:"https://i.imgur.com/2kgF4fY.jpg", info:"Water frequently. Partial sun. Harvest regularly."},
+  "Basil": { img:"https://i.imgur.com/3cT1KkK.jpg", info:"Water often. Full sun. Pinch leaves to grow bushy."},
+  "Spider Plant": { img:"https://i.imgur.com/dh8Ccm6.jpg", info:"Water weekly. Indirect light. Propagate by offsets."},
+  "Peace Lily": { img:"https://i.imgur.com/9Wm6S3Q.jpg", info:"Water weekly. Low light. Remove dead flowers."},
+  "Pothos": { img:"https://i.imgur.com/4HsPSsU.jpg", info:"Water weekly. Low to medium light. Easy to grow."},
+  "Geranium": { img:"https://i.imgur.com/n0hZ2K2.jpg", info:"Water moderately. Full sun. Deadhead flowers."},
+  "Marigold": { img:"https://i.imgur.com/Exw6JtD.jpg", info:"Water moderately. Full sun. Protect from frost."},
+  "Daffodil": { img:"https://i.imgur.com/LJxCrEo.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
+  "Snake Plant": { img:"https://i.imgur.com/NZyyRgO.jpg", info:"Water sparingly. Low light. Very hardy."},
+  "Hibiscus": { img:"https://i.imgur.com/7jL8eTP.jpg", info:"Water regularly. Full sun. Fertilize monthly."}
+};
+
+// --- Load MobileNet ---
+async function loadModel(){ model = await mobilenet.load(); identifyBtn.disabled=false; }
+loadModel();
+
+// --- File input ---
+fileInput.addEventListener('change',(e)=>{
+  const file = e.target.files[0];
+  if(file){
+    previewImage.src = URL.createObjectURL(file);
+    previewImage.style.display='block';
+    currentBlob=file;
+  }
+});
+
+// --- Camera ---
+openCameraBtn.addEventListener('click', async ()=>{
+  stream = await navigator.mediaDevices.getUserMedia({ video:true });
+  cameraView.srcObject = stream;
+  cameraView.style.display='block';
+  captureBtn.disabled=false;
+});
+captureBtn.addEventListener('click', async ()=>{
+  const canvas=document.createElement('canvas');
+  canvas.width=cameraView.videoWidth; canvas.height=cameraView.videoHeight;
+  canvas.getContext('2d').drawImage(cameraView,0,0);
+  const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg'));
+  currentBlob=blob;
+  previewImage.src = URL.createObjectURL(blob); previewImage.style.display='block';
+});
+
+// --- Recognize ---
+identifyBtn.addEventListener('click', async ()=>{
+  if(!currentBlob) return alert('Select or capture an image first!');
+  const img=await blobToImage(currentBlob);
+  const predictions = await model.classify(img);
+  const top=predictions[0];
+  let name=top.className.split(',')[0].trim();
+  if(plantsDB[name]){
+    resultText.textContent = `${name} (${(top.probability*100).toFixed(1)}%)`;
+    plantImage.src = plantsDB[name].img; plantImage.style.display='block';
+    plantInfo.textContent = plantsDB[name].info;
+    generateQR(name);
+  } else {
+    resultText.textContent = `Unknown plant (${(top.probability*100).toFixed(1)}%)`;
+    plantImage.style.display='none';
+    plantInfo.textContent='';
+  }
+});
+
+function generateQR(text){
+  new QRious({ element: qrCanvas, value:`https://wikiroots.app/plants/${encodeURIComponent(text)}`, size:200 });
+}
+
+function blobToImage(blob){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    const url=URL.createObjectURL(blob);
+    img.onload=()=>{ URL.revokeObjectURL(url); resolve(img); };
+    img.onerror=reject;
+    img.src=url;
+  });
+}
+</script>
+
 </body>
 </html>
