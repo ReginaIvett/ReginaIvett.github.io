@@ -1,22 +1,23 @@
 :root{
-  --bg:#f0f8f5;
-  --accent:#2f8f4b;
-  --card:#ffffff;
-  --text:#222;
-  --muted:#666;
-  --button-hover:#25763d;
+  --bg:#e6f7ec;           /* Fondo general */
+  --accent:#3ca54d;       /* Verde principal */
+  --accent-light:#8fd6a7; /* Verde claro */
+  --card:#ffffff;          /* Fondo de cards */
+  --text:#1a1a1a;          /* Texto principal */
+  --muted:#555;            /* Texto secundario */
+  --button-hover:#2b7d38;
 }
 
 *{
   box-sizing:border-box;
   margin:0;
   padding:0;
+  font-family:'Segoe UI',Roboto,sans-serif;
 }
 
 body{
-  font-family:'Segoe UI',Roboto,sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* --- Pantalla inicial --- */
@@ -27,141 +28,133 @@ body{
   align-items:center;
   height:100vh;
   text-align:center;
-  background:linear-gradient(180deg,#e4f6e4,#f0f8f5);
-  transition:opacity 0.8s;
-}
-
-#homeScreen.hidden{
-  opacity:0;
-  pointer-events:none;
+  background: linear-gradient(180deg, #d8f0d6, #e6f7ec);
 }
 
 #homeScreen h1{
   font-size:3em;
   color:var(--accent);
-  margin-bottom:0.2em;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+  margin-bottom:0.3em;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.1);
 }
 
 #homeScreen p{
   font-size:1.2em;
-  color:#333;
   max-width:450px;
   line-height:1.6;
+  color:#2b2b2b;
 }
 
 #homeScreen .team{
   margin-top:0.5em;
   font-weight:bold;
-  color:var(--accent);
-  font-size:1.1em;
+  color:var(--accent-light);
+  font-size:1.2em;
 }
 
 #startBtn{
-  margin-top:1.8em;
-  padding:14px 32px;
+  margin-top:2em;
+  padding:16px 36px;
   border:none;
-  background:var(--accent);
+  background: var(--accent);
   color:white;
-  border-radius:40px;
-  font-size:1.1em;
+  border-radius:50px;
+  font-size:1.2em;
   cursor:pointer;
-  transition:0.3s;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  transition: 0.3s;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 #startBtn:hover{
-  background:var(--button-hover);
-  transform: translateY(-2px);
+  background: var(--button-hover);
+  transform: translateY(-3px);
 }
 
 /* --- App container --- */
 header{
   padding:20px;
   text-align:center;
-  border-bottom:1px solid #d8ead6;
-  background:white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: linear-gradient(90deg, #3ca54d, #8fd6a7);
+  color:white;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 header h2{
   margin:0;
-  color:var(--accent);
   font-size:2em;
 }
 
 header .tagline{
   font-style:italic;
-  color:#397e4a;
   font-size:14px;
   margin-top:4px;
+  color: #e0f2e4;
 }
 
 .container{
-  max-width:900px;
+  max-width:950px;
   margin:auto;
-  padding:20px;
+  padding:25px;
   display:flex;
   flex-direction:column;
-  gap:20px;
+  gap:25px;
 }
 
 /* --- Cards --- */
 .card{
-  background:var(--card);
-  padding:20px;
-  border-radius:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  background: var(--card);
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card:hover{
-  transform: translateY(-4px);
-  box-shadow:0 12px 24px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+  box-shadow:0 15px 30px rgba(0,0,0,0.12);
 }
 
 .card h3{
-  margin-bottom:12px;
-  color:var(--accent);
+  margin-bottom:14px;
+  color: var(--accent);
+  font-size:1.6em;
 }
 
 /* --- Inputs & buttons --- */
 button,input[type=file]{
   background:#fff;
   border:1px solid #ccc;
-  padding:10px 14px;
-  border-radius:12px;
+  padding:12px 16px;
+  border-radius:16px;
   cursor:pointer;
   font-size:14px;
-  margin-top:6px;
+  margin-top:8px;
 }
 
 button.primary{
-  background:var(--accent);
+  background: var(--accent);
   color:white;
   border:none;
-  padding:10px 20px;
-  border-radius:30px;
-  margin-top:10px;
+  padding:12px 24px;
+  border-radius:40px;
+  font-weight:bold;
+  transition: 0.3s;
 }
 
 button.primary:hover{
-  background:var(--button-hover);
+  background: var(--button-hover);
   transform: translateY(-2px);
 }
 
-/* --- Media elements --- */
-#previewImage,#cameraView{
+/* --- Video & Images --- */
+#previewImage, #cameraView, #plantImage{
   width:100%;
-  border-radius:16px;
-  margin-top:14px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.1);
-}
-
-#plantImage{
-  border-radius:16px;
-  margin-top:12px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.1);
+  border-radius:20px;
+  margin-top:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  border:2px solid var(--accent-light);
 }
 
 /* --- Texts --- */
@@ -178,7 +171,7 @@ button.primary:hover{
 /* --- Footer --- */
 footer{
   text-align:center;
-  padding:14px;
-  color:#666;
+  padding:16px;
+  color:#555;
   font-size:13px;
 }
