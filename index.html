@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WikiRoots — Plant ID & Care</title>
+
+  <!-- QR code generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 2C10.5 6 8 8 6 10s-2 5 2 8 7 4 10 2c0 0 0-6-6-10C12 8 12 2 12 2z" fill="#2f8f4b"/>
+    </svg>
+    <h1>WikiRoots — Plant ID & Care</h1>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <section class="card main">
+        <div class="center">
+          <div class="header-row">
+            <strong>Identify a plant</strong>
+            <div class="muted tiny" id="performanceInfo">Perf: —</div>
+          </div>
+
+          <div class="controls card control-row">
+            <input id="fileInput" type="file" accept="image/*" />
+            <button id="cameraBtn">Use Camera</button>
+            <select id="modelSelect" title="Backend model selection">
+              <option value="auto">Backend: auto</option>
+            </select>
+            <button id="identifyBtn" class="primary">Identify</button>
+            <button id="clearBtn">Clear</button>
+          </div>
+
+          <div class="preview-area card">
+            <img id="previewImage" class="preview" alt="preview" src="" style="display:none" />
+            <div id="noImage" class="muted">No image selected</div>
+          </div>
+
+          <div class="card" id="recognitionCard">
+            <div class="recognition">
+              <div>
+                <strong>Recognition</strong>
+                <div id="recognitionBox" class="muted">No result</div>
+                <div id="confidenceBox" class="tiny muted"></div>
+              </div>
+              <div class="actions">
+                <button id="savePlantBtn" disabled>Save</button>
+                <button id="generateQrBtn">Generate QR</button>
+              </div>
+            </div>
+
+            <canvas id="qrCanvas" style="width:100%;height:160px;margin-top:10px"></canvas>
+          </div>
+
+          <div class="card" id="plantProfileCard">
+            <strong>Plant profile</strong>
+            <div id="plantProfile" class="muted">No profile shown</div>
+          </div>
+
+        </div>
+      </section>
+
+      <aside class="card side">
+        <strong>My Plants</strong>
+        <div id="myPlantsList" class="muted tiny" style="margin-top:8px">No saved plants</div>
+
+        <div style="margin-top:12px">
+          <strong>Settings</strong>
+          <div class="muted tiny" style="margin-top:8px">
+            Device memory: <span id="memHint">—</span><br/>
+            Auto reminders: <label><input id="autoRemToggle" type="checkbox" checked /> On</label>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Notes</strong>
+          <div class="muted tiny">This client calls <code>/api/identify</code>. See backend examples in README.</div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      Prototype for STEM project — WikiRoots
+    </footer>
+  </main>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
