@@ -1,22 +1,17 @@
-:root{--bg:#f6fbf3;--card:#fff;--accent:#2f8f4b;--muted:#666}
-*{box-sizing:border-box}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:linear-gradient(180deg,#f6fbf3,#eef9ef);color:#111}
-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(0,0,0,0.04);background:rgba(255,255,255,0.8);backdrop-filter:blur(4px)}
-header h1{margin:0;font-size:18px;color:var(--accent)}
-.container{max-width:1100px;margin:18px auto;padding:12px}
-.grid{display:grid;grid-template-columns:1fr 340px;gap:18px}
-.card{background:var(--card);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(30,30,30,0.06)}
-.center{display:flex;flex-direction:column;gap:10px}
-.controls{display:flex;gap:8px;flex-wrap:wrap}
-button,input[type="file"],select{background:#fff;border:1px solid #d0d0d0;padding:8px 10px;border-radius:8px;cursor:pointer}
-button.primary{background:var(--accent);color:#fff;border:0}
-.preview-area{display:flex;align-items:center;justify-content:center;height:220px}
-img.preview{max-width:100%;max-height:100%;object-fit:cover;border-radius:8px}
-.muted{color:var(--muted)}
-.tiny{font-size:12px;color:#666}
-.header-row{display:flex;justify-content:space-between;align-items:center}
-.recognition{display:flex;justify-content:space-between;align-items:center}
-.actions{display:flex;gap:8px}
-.side{display:flex;flex-direction:column;gap:12px}
-footer{margin-top:16px;text-align:center;color:var(--muted);font-size:13px}
-@media(max-width:980px){.grid{grid-template-columns:1fr}}
+:root{--bg:#f6fbf3;--accent:#2f8f4b;--card:#fff;--text:#222;--muted:#666;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);}
+#homeScreen{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center;background:linear-gradient(180deg,#e4f6e4,#f6fbf3);transition:opacity 0.8s;}
+#homeScreen.hidden{opacity:0;pointer-events:none;}
+#homeScreen h1{font-size:2.4em;color:var(--accent);margin-bottom:0.2em;}
+#homeScreen p{font-size:1.1em;color:#333;max-width:420px;line-height:1.5;}
+#homeScreen .team{margin-top:0.5em;font-weight:bold;color:#2f8f4b;}
+#startBtn{margin-top:1.4em;padding:12px 28px;border:none;background:var(--accent);color:white;border-radius:30px;font-size:1em;cursor:pointer;transition:0.3s;}
+#startBtn:hover{background:#25763d;}
+#appContainer{display:none;}
+header{padding:16px;text-align:center;border-bottom:1px solid #d8ead6;background:white;}
+header h2{margin:0;color:var(--accent);}
+header .tagline{font-style:italic;color:#397e4a;font-size:14px;}
+.container{max-width:900px;margin:auto;padding:16px;}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:18px;}
+button,input[type=file],select{background:#fff;border:1px solid #ccc;padding:8px
