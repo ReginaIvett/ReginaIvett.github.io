@@ -57,9 +57,7 @@ footer{text-align:center;padding:10px;color:#666;font-size:13px;}
 <h3>Identify your plant</h3>
 <input type="file" id="fileInput" accept="image/*">
 <button id="openCameraBtn">Open Camera</button>
-<button id="captureBtn" disabled>Capture</button>
-<button id="identifyBtn" class="primary" disabled>Recognize</button>
-<p class="muted">Upload or capture a plant photo for instant recognition.</p>
+<p class="muted">Upload or point the camera to a plant for instant recognition.</p>
 <img id="previewImage" alt="Preview">
 <video id="cameraView" autoplay playsinline></video>
 
@@ -79,115 +77,71 @@ footer{text-align:center;padding:10px;color:#666;font-size:13px;}
 
 <script>
 // --- Pantalla inicial ---
-const homeScreen = document.getElementById('homeScreen');
-const appContainer = document.getElementById('appContainer');
-const startBtn = document.getElementById('startBtn');
-startBtn.addEventListener('click', () => {
+const homeScreen=document.getElementById('homeScreen');
+const appContainer=document.getElementById('appContainer');
+const startBtn=document.getElementById('startBtn');
+startBtn.addEventListener('click',()=>{
   homeScreen.classList.add('hidden');
-  setTimeout(()=>{ homeScreen.style.display='none'; appContainer.style.display='block'; },700);
+  setTimeout(()=>{homeScreen.style.display='none';appContainer.style.display='block';},700);
 });
 
 // --- Variables ---
-const fileInput = document.getElementById('fileInput');
-const previewImage = document.getElementById('previewImage');
-const cameraView = document.getElementById('cameraView');
-const openCameraBtn = document.getElementById('openCameraBtn');
-const captureBtn = document.getElementById('captureBtn');
-const identifyBtn = document.getElementById('identifyBtn');
-const resultText = document.getElementById('resultText');
-const qrCanvas = document.getElementById('qrCanvas');
-const plantImage = document.getElementById('plantImage');
-const plantInfo = document.getElementById('plantInfo');
+const fileInput=document.getElementById('fileInput');
+const previewImage=document.getElementById('previewImage');
+const cameraView=document.getElementById('cameraView');
+const openCameraBtn=document.getElementById('openCameraBtn');
+const resultText=document.getElementById('resultText');
+const qrCanvas=document.getElementById('qrCanvas');
+const plantImage=document.getElementById('plantImage');
+const plantInfo=document.getElementById('plantInfo');
 
-let currentBlob = null, model = null, stream = null;
+let currentBlob=null, model=null, stream=null;
 
 // --- Plant database ---
-const plantsDB = {
-  "Monstera": { img:"https://i.imgur.com/F2QGz3Y.jpg", info:"Water weekly. Indirect light. Repot every 2 years."},
-  "Aloe Vera": { img:"https://i.imgur.com/IBV3rjH.jpg", info:"Water every 2-3 weeks. Full sun. Avoid overwatering."},
-  "Lavender": { img:"https://i.imgur.com/KM2OjRM.jpg", info:"Water weekly. Full sun. Prune after flowering."},
-  "Fiddle Leaf Fig": { img:"https://i.imgur.com/urU1DBU.jpg", info:"Water weekly. Bright indirect light. Rotate monthly."},
-  "Sunflower": { img:"https://i.imgur.com/j1jvM3U.jpg", info:"Water regularly. Full sun. Support tall stems."},
-  "Cactus": { img:"https://i.imgur.com/6oXdfPZ.jpg", info:"Water sparingly. Full sun. Well-drained soil."},
-  "Rose": { img:"https://i.imgur.com/Yr9K4uJ.jpg", info:"Water daily in summer. Full sun. Prune regularly."},
-  "Orchid": { img:"https://i.imgur.com/h8L2HUp.jpg", info:"Water weekly. Indirect light. Keep humidity high."},
-  "Bamboo": { img:"https://i.imgur.com/4cJ6k4R.jpg", info:"Water daily. Bright indirect light. Fertilize monthly."},
-  "Tulip": { img:"https://i.imgur.com/9iHg6Vd.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
-  "Mint": { img:"https://i.imgur.com/2kgF4fY.jpg", info:"Water frequently. Partial sun. Harvest regularly."},
-  "Basil": { img:"https://i.imgur.com/3cT1KkK.jpg", info:"Water often. Full sun. Pinch leaves to grow bushy."},
-  "Spider Plant": { img:"https://i.imgur.com/dh8Ccm6.jpg", info:"Water weekly. Indirect light. Propagate by offsets."},
-  "Peace Lily": { img:"https://i.imgur.com/9Wm6S3Q.jpg", info:"Water weekly. Low light. Remove dead flowers."},
-  "Pothos": { img:"https://i.imgur.com/4HsPSsU.jpg", info:"Water weekly. Low to medium light. Easy to grow."},
-  "Geranium": { img:"https://i.imgur.com/n0hZ2K2.jpg", info:"Water moderately. Full sun. Deadhead flowers."},
-  "Marigold": { img:"https://i.imgur.com/Exw6JtD.jpg", info:"Water moderately. Full sun. Protect from frost."},
-  "Daffodil": { img:"https://i.imgur.com/LJxCrEo.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
-  "Snake Plant": { img:"https://i.imgur.com/NZyyRgO.jpg", info:"Water sparingly. Low light. Very hardy."},
-  "Hibiscus": { img:"https://i.imgur.com/7jL8eTP.jpg", info:"Water regularly. Full sun. Fertilize monthly."}
+const plantsDB={
+"Monstera": { img:"https://i.imgur.com/F2QGz3Y.jpg", info:"Water weekly. Indirect light. Repot every 2 years."},
+"Aloe Vera": { img:"https://i.imgur.com/IBV3rjH.jpg", info:"Water every 2-3 weeks. Full sun. Avoid overwatering."},
+"Lavender": { img:"https://i.imgur.com/KM2OjRM.jpg", info:"Water weekly. Full sun. Prune after flowering."},
+"Fiddle Leaf Fig": { img:"https://i.imgur.com/urU1DBU.jpg", info:"Water weekly. Bright indirect light. Rotate monthly."},
+"Sunflower": { img:"https://i.imgur.com/j1jvM3U.jpg", info:"Water regularly. Full sun. Support tall stems."},
+"Cactus": { img:"https://i.imgur.com/6oXdfPZ.jpg", info:"Water sparingly. Full sun. Well-drained soil."},
+"Rose": { img:"https://i.imgur.com/Yr9K4uJ.jpg", info:"Water daily in summer. Full sun. Prune regularly."},
+"Orchid": { img:"https://i.imgur.com/h8L2HUp.jpg", info:"Water weekly. Indirect light. Keep humidity high."},
+"Bamboo": { img:"https://i.imgur.com/4cJ6k4R.jpg", info:"Water daily. Bright indirect light. Fertilize monthly."},
+"Tulip": { img:"https://i.imgur.com/9iHg6Vd.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
+"Mint": { img:"https://i.imgur.com/2kgF4fY.jpg", info:"Water frequently. Partial sun. Harvest regularly."},
+"Basil": { img:"https://i.imgur.com/3cT1KkK.jpg", info:"Water often. Full sun. Pinch leaves to grow bushy."},
+"Spider Plant": { img:"https://i.imgur.com/dh8Ccm6.jpg", info:"Water weekly. Indirect light. Propagate by offsets."},
+"Peace Lily": { img:"https://i.imgur.com/9Wm6S3Q.jpg", info:"Water weekly. Low light. Remove dead flowers."},
+"Pothos": { img:"https://i.imgur.com/4HsPSsU.jpg", info:"Water weekly. Low to medium light. Easy to grow."},
+"Geranium": { img:"https://i.imgur.com/n0hZ2K2.jpg", info:"Water moderately. Full sun. Deadhead flowers."},
+"Marigold": { img:"https://i.imgur.com/Exw6JtD.jpg", info:"Water moderately. Full sun. Protect from frost."},
+"Daffodil": { img:"https://i.imgur.com/LJxCrEo.jpg", info:"Water moderately. Full sun. Plant bulbs in fall."},
+"Snake Plant": { img:"https://i.imgur.com/NZyyRgO.jpg", info:"Water sparingly. Low light. Very hardy."},
+"Hibiscus": { img:"https://i.imgur.com/7jL8eTP.jpg", info:"Water regularly. Full sun. Fertilize monthly."}
 };
 
 // --- Load MobileNet ---
-async function loadModel(){ model = await mobilenet.load(); identifyBtn.disabled=false; }
+async function loadModel(){ model = await mobilenet.load(); }
 loadModel();
 
 // --- File input ---
 fileInput.addEventListener('change',(e)=>{
-  const file = e.target.files[0];
+  const file=e.target.files[0];
   if(file){
-    previewImage.src = URL.createObjectURL(file);
+    previewImage.src=URL.createObjectURL(file);
     previewImage.style.display='block';
     currentBlob=file;
+    recognizeBlob(file);
   }
 });
 
-// --- Camera ---
+// --- Camera & real-time recognition ---
 openCameraBtn.addEventListener('click', async ()=>{
-  stream = await navigator.mediaDevices.getUserMedia({ video:true });
-  cameraView.srcObject = stream;
-  cameraView.style.display='block';
-  captureBtn.disabled=false;
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:true});
+    cameraView.srcObject=stream;
+    cameraView.style.display='block';
+    requestAnimationFrame(recognizeFrame);
+  }catch(err){ alert('Camera access denied or not supported.'); }
 });
-captureBtn.addEventListener('click', async ()=>{
-  const canvas=document.createElement('canvas');
-  canvas.width=cameraView.videoWidth; canvas.height=cameraView.videoHeight;
-  canvas.getContext('2d').drawImage(cameraView,0,0);
-  const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg'));
-  currentBlob=blob;
-  previewImage.src = URL.createObjectURL(blob); previewImage.style.display='block';
-});
-
-// --- Recognize ---
-identifyBtn.addEventListener('click', async ()=>{
-  if(!currentBlob) return alert('Select or capture an image first!');
-  const img=await blobToImage(currentBlob);
-  const predictions = await model.classify(img);
-  const top=predictions[0];
-  let name=top.className.split(',')[0].trim();
-  if(plantsDB[name]){
-    resultText.textContent = `${name} (${(top.probability*100).toFixed(1)}%)`;
-    plantImage.src = plantsDB[name].img; plantImage.style.display='block';
-    plantInfo.textContent = plantsDB[name].info;
-    generateQR(name);
-  } else {
-    resultText.textContent = `Unknown plant (${(top.probability*100).toFixed(1)}%)`;
-    plantImage.style.display='none';
-    plantInfo.textContent='';
-  }
-});
-
-function generateQR(text){
-  new QRious({ element: qrCanvas, value:`https://wikiroots.app/plants/${encodeURIComponent(text)}`, size:200 });
-}
-
-function blobToImage(blob){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    const url=URL.createObjectURL(blob);
-    img.onload=()=>{ URL.revokeObjectURL(url); resolve(img); };
-    img.onerror=reject;
-    img.src=url;
-  });
-}
-</script>
-
-</body>
-</html>
