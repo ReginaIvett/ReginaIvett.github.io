@@ -1,14 +1,8 @@
 // app.js
-// --- Pantalla inicial ---
 const homeScreen = document.getElementById('homeScreen');
 const appContainer = document.getElementById('appContainer');
 const startBtn = document.getElementById('startBtn');
-startBtn.addEventListener('click', () => {
-  homeScreen.classList.add('hidden');
-  setTimeout(()=>{ homeScreen.style.display='none'; appContainer.style.display='block';},700);
-});
 
-// --- Variables ---
 const fileInput = document.getElementById('fileInput');
 const previewImage = document.getElementById('previewImage');
 const cameraView = document.getElementById('cameraView');
@@ -19,6 +13,12 @@ const plantImage = document.getElementById('plantImage');
 const plantInfo = document.getElementById('plantInfo');
 
 let currentBlob = null, model = null, stream = null;
+
+// --- Home screen ---
+startBtn.addEventListener('click',()=>{
+  homeScreen.classList.add('hidden');
+  setTimeout(()=>{ homeScreen.style.display='none'; appContainer.style.display='block'; },700);
+});
 
 // --- Load MobileNet ---
 async function loadModel(){ model = await mobilenet.load(); }
@@ -35,6 +35,30 @@ fileInput.addEventListener('change',(e)=>{
   }
 });
 
+// --- Camera real-time recognition ---
+openCameraBtn.addEventListener('click', async ()=>{
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:true});
+    cameraView.srcObject=stream;
+    cameraView.style.display='block';
+    requestAnimationFrame(recognizeFrame);
+  }catch(err){ alert('Camera access denied or not supported.'); }
+});
+
+async function recognizeFrame(){
+  if(!model || !cameraView.srcObject) return;
+  if(cameraView.videoWidth && cameraView.videoHeight){
+    const canvas=document.createElement('canvas');
+    canvas.width=cameraView.videoWidth;
+    canvas.height=cameraView.videoHeight;
+    canvas.getContext('2d').drawImage(cameraView,0,0);
+    const blob = await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg'));
+    recognizeBlob(blob);
+  }
+  setTimeout(()=>requestAnimationFrame(recognizeFrame),500);
+}
+
+// --- Recognize a blob ---
 async function recognizeBlob(blob){
   if(!model) return;
   const img = await blobToImage(blob);
@@ -44,53 +68,30 @@ async function recognizeBlob(blob){
   displayResult(name, top.probability);
 }
 
-// --- Camera & real-time recognition ---
-openCameraBtn.addEventListener('click', async ()=>{
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:true});
-    cameraView.srcObject = stream;
-    cameraView.style.display='block';
-    requestAnimationFrame(recognizeFrame);
-  }catch(err){ alert('Camera access denied or not supported.'); }
-});
-
-async function recognizeFrame(){
-  if(!model || !cameraView.srcObject) return;
-  if(cameraView.videoWidth && cameraView.videoHeight){
-    const canvas = document.createElement('canvas');
-    canvas.width = cameraView.videoWidth;
-    canvas.height = cameraView.videoHeight;
-    canvas.getContext('2d').drawImage(cameraView,0,0);
-    const blob = await new Promise(resolve => canvas.toBlob(resolve,'image/jpeg'));
-    recognizeBlob(blob);
-  }
-  setTimeout(()=>requestAnimationFrame(recognizeFrame), 500);
-}
-
-// --- Helper functions ---
 function displayResult(name, prob){
   if(plantsDB[name]){
-    resultText.textContent = `${name} (${(prob*100).toFixed(1)}%)`;
-    plantImage.src = plantsDB[name].img; plantImage.style.display='block';
-    plantInfo.textContent = plantsDB[name].info;
+    resultText.textContent=`${name} (${(prob*100).toFixed(1)}%)`;
+    plantImage.src=plantsDB[name].img;
+    plantImage.style.display='block';
+    plantInfo.textContent=plantsDB[name].info;
     generateQR(name);
   } else {
-    resultText.textContent = `Unknown plant (${(prob*100).toFixed(1)}%)`;
+    resultText.textContent=`Unknown plant (${(prob*100).toFixed(1)}%)`;
     plantImage.style.display='none';
     plantInfo.textContent='';
   }
 }
 
 function generateQR(text){
-  new QRious({ element: qrCanvas, value:`https://wikiroots.app/plants/${encodeURIComponent(text)}`, size:200 });
+  new QRious({ element:qrCanvas, value:`https://wikiroots.app/plants/${encodeURIComponent(text)}`, size:200 });
 }
 
 function blobToImage(blob){
   return new Promise((resolve,reject)=>{
-    const img = new Image();
-    const url = URL.createObjectURL(blob);
-    img.onload = ()=>{ URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = reject;
-    img.src = url;
+    const img=new Image();
+    const url=URL.createObjectURL(blob);
+    img.onload=()=>{ URL.revokeObjectURL(url); resolve(img); };
+    img.onerror=reject;
+    img.src=url;
   });
 }
