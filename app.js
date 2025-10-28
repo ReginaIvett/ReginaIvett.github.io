@@ -1,66 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WikiRoots</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>🌿 WikiRoots</h1>
-        <p>Discover, care and connect with nature</p>
-        <p class="team">By Team #4</p>
-    </header>
+// Modelo de Teachable Machine (público)
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/5fHnbuGx3/";
 
-    <main>
-        <!-- Sección de inicio -->
-        <section id="startScreen">
-            <h2>Welcome to WikiRoots!</h2>
-            <p>Identify your plants, learn how to care for them, and generate QR codes for your collection.</p>
-            <button id="startBtn">Start</button>
-        </section>
+let video = document.getElementById("camera");
+let canvas = document.getElementById("canvas");
+let flipBtn = document.getElementById("flipBtn");
+let startBtn = document.getElementById("startBtn");
+let captureBtn = document.getElementById("captureBtn");
+let loading = document.getElementById("loading");
+let resultSection = document.getElementById("resultSection");
+let plantName = document.getElementById("plantName");
+let plantInfo = document.getElementById("plantInfo");
+let plantImage = document.getElementById("plantImage");
 
-        <!-- Sección de cámara -->
-        <section id="cameraSection" class="hidden">
-            <h2>Camera</h2>
-            <video id="camera" autoplay playsinline></video>
-            <div class="camera-buttons">
-                <button id="flipBtn">🔄 Flip Camera</button>
-                <button id="captureBtn">📸 Capture</button>
-            </div>
-            <canvas id="canvas" class="hidden"></canvas>
-            <p id="loading" class="hidden">Analyzing plant...</p>
-        </section>
+let currentStream;
+let useFrontCamera = false;
 
-        <!-- Sección de resultados -->
-        <section id="resultSection" class="hidden">
-            <h2>Plant Identified 🌱</h2>
-            <img id="plantImage" alt="Plant">
-            <p id="plantName"></p>
-            <p id="plantInfo"></p>
-            <div id="qrCode"></div>
-        </section>
+// Iniciar cámara
+async function startCamera() {
+    document.getElementById("cameraSection").classList.remove("hidden");
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
 
-        <!-- Sección de explicación de la app -->
-        <section id="about">
-            <h2>About WikiRoots</h2>
-            <p>WikiRoots is your personal plant assistant! Take a photo of your plant, get detailed information about it, learn how to care for it, and generate a QR code to track its profile.</p>
-            <ul>
-                <li>📸 Take photos with AI-powered recognition</li>
-                <li>🌱 Learn plant care, watering schedules, and pruning tips</li>
-                <li>📌 Save your plants in "My Plants" and get reminders</li>
-                <li>🔗 Generate QR codes to quickly access plant profiles</li>
-            </ul>
-        </section>
-    </main>
+    const constraints = {
+        video: { facingMode: useFrontCamera ? "user" : "environment" }
+    };
 
-    <footer>
-        <p>©️ 2025 WikiRoots Project</p>
-    </footer>
+    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = currentStream;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+flipBtn.addEventListener("click", () => {
+    useFrontCamera = !useFrontCamera;
+    startCamera();
+});
+
+startBtn.addEventListener("click", () => {
+    startCamera();
+    startBtn.classList.add("hidden");
+});
+
+captureBtn.addEventListener("click", async () => {
+    loading.classList.remove("hidden");
+
+    const ctx = canvas.getContext("2d");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+
+    const prediction = await predictPlant();
+
+    loading.classList.add("hidden");
+    resultSection.classList.remove("hidden");
+
+    const plants = {
+        "Sunflower": "Needs direct sunlight and watering twice a week.",
+        "Rose": "Water every 2-3 days and prune regularly.",
+        "Cactus": "Requires little water and lots of light.",
+        "Basil": "Needs sunlight and watering every day.",
+        "Orchid": "Keep in bright, indirect light with moderate watering.",
+        "Lavender": "Loves sunlight and dry soil.",
+        "Fern": "Prefers shade and moist soil.",
+        "Aloe Vera": "Needs bright light, water every 2 weeks.",
+        "Mint": "Keep soil moist and partial sunlight.",
+        "Peace Lily": "Keep soil damp, avoid direct sunlight."
+    };
+
+    if (plants[prediction]) {
+        plantName.textContent = prediction;
+        plantInfo.textContent = plants[prediction];
+        plantImage.src = `images/${prediction.toLowerCase().replace(' ', '-')}.jpg`;
+        document.getElementById("qrCode").innerHTML = "";
+        new QRCode(document.getElementById("qrCode"), {
+            text: `https://wikiroots.com/plants/${prediction.toLowerCase().replace(' ', '-')}`,
+            width: 100,
+            height: 100
+        });
+    } else {
+        plantName.textContent = "Unknown Plant";
+        plantInfo.textContent = "Try again with a clearer picture.";
+    }
+});
+
+// Predicción con modelo de Teachable Machine
+async function predictPlant() {
+    const modelURL = MODEL_URL + "model.json";
+    const metadataURL = MODEL_URL + "metadata.json";
+
+    const model = await tmImage.load(modelURL, metadataURL);
+    const prediction = await model.predict(video);
+
+    prediction.sort((a, b) => b.probability - a.probability);
+    return prediction[0].className;
+}
