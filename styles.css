@@ -1,17 +1,21 @@
+/* General */
 body {
   margin: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: linear-gradient(180deg, #e6f4ea 0%, #b9e6c9 100%);
   color: #2f3e2f;
   text-align: center;
 }
 
+/* Oculto */
 .hidden {
   display: none;
 }
 
+/* Header / Hero */
 .hero {
   padding: 80px 20px;
+  background: linear-gradient(135deg, #a8e6cf, #dcedc1);
 }
 
 .hero h1 {
@@ -21,7 +25,7 @@ body {
 }
 
 .hero .tagline {
-  font-size: 1.1em;
+  font-size: 1.2em;
   color: #3b6d43;
   margin-bottom: 5px;
 }
@@ -29,31 +33,33 @@ body {
 .team {
   font-weight: bold;
   color: #2b5d34;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
+/* Buttons */
 .btn {
   background-color: #4caf50;
   color: white;
   border: none;
   padding: 12px 25px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 1em;
-  margin: 5px;
+  margin: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
 .btn:hover {
   background-color: #45a049;
-  transform: scale(1.05);
+  transform: translateY(-2px);
 }
 
 .btn.green {
   background-color: #6dd47e;
-  color: #fff;
 }
 
+/* Camera Section */
 .camera-section {
   padding: 30px;
 }
@@ -61,41 +67,78 @@ body {
 video {
   width: 90%;
   max-width: 500px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px #93c49d;
-  margin-top: 10px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px #93c49d;
+  margin-top: 15px;
 }
 
 canvas {
   width: 90%;
   max-width: 500px;
   border: 2px solid #4caf50;
-  border-radius: 10px;
-  margin-top: 10px;
+  border-radius: 12px;
+  margin-top: 15px;
 }
 
-.result-section {
+/* Controls */
+.controls {
+  margin-top: 20px;
+}
+
+/* Loading Screen */
+#loadingScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #2e7d32;
+  font-weight: bold;
+  padding: 40px;
+}
+
+.loader {
+  border: 6px solid #c8e6c9;
+  border-top: 6px solid #2e7d32;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Result Section */
+#resultSection {
   margin-top: 40px;
 }
 
 .plant-card {
   background-color: #f0fff4;
-  border-radius: 10px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 25px;
   margin: 20px auto;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 0 10px #cde8d2;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
 .plant-card img {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
+  margin-bottom: 15px;
 }
 
+/* Footer */
 footer {
   background: #2b5d34;
   color: white;
   padding: 15px;
   margin-top: 50px;
+  font-size: 0.9em;
+  box-shadow: 0 -4px 6px rgba(0,0,0,0.2);
 }
