@@ -10,9 +10,9 @@
 <body>
   <header class="hero">
     <h1>🌿 WikiRoots</h1>
-    <p class="tagline">“Connecting people with nature, one plant at a time.”</p>
+    <p>“Connecting people with nature, one plant at a time.”</p>
     <p class="team">By Team #4</p>
-    <button id="startBtn" class="btn start">Start Exploring</button>
+    <button id="startBtn" class="btn start">Start</button>
   </header>
 
   <main id="appContainer" class="hidden">
@@ -30,15 +30,19 @@
       </div>
     </section>
 
+    <!-- Pantalla de carga -->
+    <section id="loadingScreen" class="hidden">
+      <div class="loader"></div>
+      <p>Analyzing your plant...</p>
+    </section>
+
     <section id="resultSection" class="hidden">
-      <h2>🌿 Plant Information</h2>
-      <div id="plantResult" class="plant-card">
-        <img id="plantImage" src="" alt="Plant Image" />
-        <h3 id="plantName"></h3>
-        <p id="plantInfo"></p>
-        <p id="plantCare"></p>
-        <div id="qrCode"></div>
-      </div>
+      <h2>🌱 Plant Info</h2>
+      <img id="plantImage" src="" alt="Plant Image" />
+      <h3 id="plantName"></h3>
+      <p id="plantInfo"></p>
+      <p id="plantCare"></p>
+      <div id="qrCode"></div>
     </section>
   </main>
 
