@@ -1,114 +1,114 @@
-// app.js
-const homeScreen = document.getElementById('homeScreen');
-const appContainer = document.getElementById('appContainer');
-const startBtn = document.getElementById('startBtn');
-const cameraView = document.getElementById('cameraView');
-const resultText = document.getElementById('resultText');
-const qrCanvas = document.getElementById('qrCanvas');
-const plantImage = document.getElementById('plantImage');
-const plantInfo = document.getElementById('plantInfo');
-const openCameraBtn = document.getElementById('openCameraBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  const startBtn = document.getElementById("startBtn");
+  const appContainer = document.getElementById("appContainer");
+  const openCameraBtn = document.getElementById("openCameraBtn");
+  const captureBtn = document.getElementById("captureBtn");
+  const flipBtn = document.getElementById("flipBtn");
+  const recognizeBtn = document.getElementById("recognizeBtn");
+  const upload = document.getElementById("upload");
+  const camera = document.getElementById("camera");
+  const snapshot = document.getElementById("snapshot");
+  const ctx = snapshot.getContext("2d");
 
-let model = null, stream = null;
-let currentCamera = 'environment';
+  let model, currentStream, facingMode = "environment";
 
-// --- Start Button ---
-startBtn.addEventListener('click', ()=>{
-  homeScreen.style.display='none';
-  appContainer.style.display='block';
-});
-
-// --- Flip Camera Button ---
-const flipCameraBtn = document.createElement('button');
-flipCameraBtn.textContent = 'Flip Camera';
-flipCameraBtn.classList.add('primary');
-document.querySelector('.container').prepend(flipCameraBtn);
-
-flipCameraBtn.addEventListener('click', async ()=>{
-  currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
-  if(stream) stream.getTracks().forEach(track => track.stop());
-  startCamera(currentCamera);
-});
-
-// --- Load MobileNet ---
-async function loadModel(){
-  model = await mobilenet.load();
-  console.log('MobileNet loaded');
-}
-loadModel();
-
-// --- Name mapping MobileNet -> plantsDB ---
-const nameMap = {
-  'sunflower':'Sunflower',
-  'aloe':'Aloe Vera',
-  'monstera':'Monstera',
-  'fiddle leaf fig':'Fiddle Leaf Fig',
-  'lavender':'Lavender',
-  'cactus':'Cactus',
-  'rose':'Rose',
-  'orchid':'Orchid',
-  'bamboo':'Bamboo',
-  'tulip':'Tulip',
-  'mint':'Mint',
-  'basil':'Basil',
-  'spider plant':'Spider Plant',
-  'peace lily':'Peace Lily',
-  'pothos':'Pothos',
-  'geranium':'Geranium',
-  'marigold':'Marigold',
-  'daffodil':'Daffodil',
-  'snake plant':'Snake Plant',
-  'hibiscus':'Hibiscus'
-};
-
-// --- Start Camera ---
-openCameraBtn.addEventListener('click', ()=>startCamera(currentCamera));
-
-async function startCamera(facing){
-  if(!model) return alert('Model not loaded yet!');
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode: facing}});
-    cameraView.srcObject = stream;
-    cameraView.play();
-    cameraView.onloadeddata = ()=>recognizeFrame();
-  }catch(err){ alert('Camera access denied or not supported.'); }
-}
-
-// --- Recognize frame in real-time ---
-async function recognizeFrame(){
-  if(!model || !cameraView.srcObject) return;
-  const predictions = await model.classify(cameraView);
-  if(predictions.length>0){
-    const top = predictions[0];
-    let key = top.className.split(',')[0].trim().toLowerCase();
-    let plantName = nameMap[key];
-    if(plantName){
-      displayResult(plantName, top.probability);
-    } else {
-      resultText.textContent = `Unknown plant (${(top.probability*100).toFixed(1)}%)`;
-      plantImage.style.display='none';
-      plantInfo.textContent='';
-    }
-  }
-  requestAnimationFrame(recognizeFrame);
-}
-
-// --- Display result and generate QR ---
-function displayResult(name, prob){
-  if(plantsDB[name]){
-    resultText.textContent = `${name} (${(prob*100).toFixed(1)}%)`;
-    plantImage.src = plantsDB[name].img;
-    plantImage.style.display='block';
-    plantInfo.textContent = plantsDB[name].info;
-    generateQR(name);
-  }
-}
-
-// --- Generate QR code ---
-function generateQR(text){
-  new QRious({
-    element: qrCanvas,
-    value: `https://wikiroots.app/plants/${encodeURIComponent(text)}`,
-    size:200
+  // Show main app
+  startBtn.addEventListener("click", () => {
+    document.querySelector(".hero").classList.add("hidden");
+    appContainer.classList.remove("hidden");
   });
-}
+
+  // Open camera
+  openCameraBtn.addEventListener("click", async () => {
+    if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+    try {
+      currentStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode }
+      });
+      camera.srcObject = currentStream;
+    } catch (err) {
+      alert("Camera access denied or unavailable.");
+    }
+  });
+
+  // Flip camera
+  flipBtn.addEventListener("click", async () => {
+    facingMode = facingMode === "user" ? "environment" : "user";
+    if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+    currentStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode }
+    });
+    camera.srcObject = currentStream;
+  });
+
+  // Capture image
+  captureBtn.addEventListener("click", () => {
+    snapshot.width = camera.videoWidth;
+    snapshot.height = camera.videoHeight;
+    ctx.drawImage(camera, 0, 0);
+    snapshot.classList.remove("hidden");
+  });
+
+  // Load model
+  (async () => {
+    model = await mobilenet.load();
+    console.log("✅ MobileNet model loaded");
+  })();
+
+  // Recognize plant
+  recognizeBtn.addEventListener("click", async () => {
+    if (!model) {
+      alert("Model still loading. Please wait a moment.");
+      return;
+    }
+
+    const resultSection = document.getElementById("resultSection");
+    resultSection.classList.remove("hidden");
+
+    const img = new Image();
+    img.src = snapshot.toDataURL();
+
+    const predictions = await model.classify(img);
+    const best = predictions[0];
+    const name = best.className.toLowerCase();
+
+    const plant = plantsDB.find(p => name.includes(p.name.toLowerCase()));
+
+    if (plant) {
+      document.getElementById("plantName").textContent = plant.name;
+      document.getElementById("plantInfo").textContent = plant.info;
+      document.getElementById("plantCare").textContent = plant.care;
+      document.getElementById("plantImage").src = plant.image;
+
+      new QRious({
+        element: document.getElementById("qrCode"),
+        value: `${plant.name} — Care: ${plant.care}`,
+        size: 120
+      });
+    } else {
+      document.getElementById("plantName").textContent = "Unknown Plant 🌱";
+      document.getElementById("plantInfo").textContent = "Try another photo or better lighting.";
+      document.getElementById("plantImage").src = "";
+      document.getElementById("plantCare").textContent = "";
+      document.getElementById("qrCode").innerHTML = "";
+    }
+  });
+
+  // Upload image manually
+  upload.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (ev) {
+      const img = new Image();
+      img.onload = () => {
+        snapshot.width = img.width;
+        snapshot.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        snapshot.classList.remove("hidden");
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+});
