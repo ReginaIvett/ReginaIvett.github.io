@@ -9,10 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const camera = document.getElementById("camera");
   const snapshot = document.getElementById("snapshot");
   const ctx = snapshot.getContext("2d");
+  const loadingScreen = document.getElementById("loadingScreen");
+  const resultSection = document.getElementById("resultSection");
 
   let model, currentStream, facingMode = "environment";
 
-  // Show main app
+  // Start app
   startBtn.addEventListener("click", () => {
     document.querySelector(".hero").classList.add("hidden");
     appContainer.classList.remove("hidden");
@@ -52,63 +54,51 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load model
   (async () => {
     model = await mobilenet.load();
-    console.log("✅ MobileNet model loaded");
+    console.log("✅ MobileNet model loaded successfully.");
   })();
 
   // Recognize plant
   recognizeBtn.addEventListener("click", async () => {
     if (!model) {
-      alert("Model still loading. Please wait a moment.");
+      alert("Model not loaded yet!");
       return;
     }
 
-    const resultSection = document.getElementById("resultSection");
-    resultSection.classList.remove("hidden");
+    loadingScreen.classList.remove("hidden");
+    resultSection.classList.add("hidden");
 
     const img = new Image();
     img.src = snapshot.toDataURL();
 
-    const predictions = await model.classify(img);
-    const best = predictions[0];
-    const name = best.className.toLowerCase();
+    // Esperar un poco para mostrar el efecto visual del loader
+    setTimeout(async () => {
+      const predictions = await model.classify(img);
+      const best = predictions[0];
+      const name = best.className.toLowerCase();
 
-    const plant = plantsDB.find(p => name.includes(p.name.toLowerCase()));
+      const plant = plantsDB.find(p => name.includes(p.name.toLowerCase()));
 
-    if (plant) {
-      document.getElementById("plantName").textContent = plant.name;
-      document.getElementById("plantInfo").textContent = plant.info;
-      document.getElementById("plantCare").textContent = plant.care;
-      document.getElementById("plantImage").src = plant.image;
+      loadingScreen.classList.add("hidden");
+      resultSection.classList.remove("hidden");
 
-      new QRious({
-        element: document.getElementById("qrCode"),
-        value: `${plant.name} — Care: ${plant.care}`,
-        size: 120
-      });
-    } else {
-      document.getElementById("plantName").textContent = "Unknown Plant 🌱";
-      document.getElementById("plantInfo").textContent = "Try another photo or better lighting.";
-      document.getElementById("plantImage").src = "";
-      document.getElementById("plantCare").textContent = "";
-      document.getElementById("qrCode").innerHTML = "";
-    }
-  });
+      if (plant) {
+        document.getElementById("plantName").textContent = plant.name;
+        document.getElementById("plantInfo").textContent = plant.info;
+        document.getElementById("plantCare").textContent = plant.care;
+        document.getElementById("plantImage").src = plant.image;
 
-  // Upload image manually
-  upload.addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (ev) {
-      const img = new Image();
-      img.onload = () => {
-        snapshot.width = img.width;
-        snapshot.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        snapshot.classList.remove("hidden");
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
+        new QRious({
+          element: document.getElementById("qrCode"),
+          value: plant.name,
+          size: 120
+        });
+      } else {
+        document.getElementById("plantName").textContent = "Unknown Plant 🌱";
+        document.getElementById("plantInfo").textContent =
+          "Try better lighting or another angle.";
+        document.getElementById("plantImage").src = "";
+        document.getElementById("qrCode").innerHTML = "";
+      }
+    }, 1800); // muestra el mensaje ~1.8 segundos
   });
 });
